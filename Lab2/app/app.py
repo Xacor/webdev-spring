@@ -58,7 +58,7 @@ def calc():
 def phone():
     error_msg = ''
     input_class = ''
-    phone = request.form.get('phone')
+    phone = request.form.get('phone') if request.form.get('phone') else ''
     if request.method == 'POST':
         error_msg = ''
         input_class = ''
