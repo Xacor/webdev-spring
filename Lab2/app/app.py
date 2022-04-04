@@ -4,11 +4,13 @@ import operator as op
 app = Flask(__name__)
 application = app
 
-OPERATIONS = {'+': op.add, '-': op.sub, '*':op.mul, '/':op.truediv}
+OPERATIONS = {'+': op.add, '-': op.sub, '*': op.mul, '/': op.truediv}
+
 
 @app.route('/')
 def index():
     return render_template('index.html')
+
 
 @app.route('/args')
 def args():
@@ -34,6 +36,7 @@ def cookies():
 def form():
     return render_template('form.html')
 
+
 @app.route('/calc', methods=['GET', 'POST'])
 def calc():
     result = None
@@ -49,3 +52,39 @@ def calc():
         except ZeroDivisionError:
             error_msg = 'Деление на ноль'
     return render_template('calc.html', operations=OPERATIONS, result=result, error_msg=error_msg)
+
+
+@app.route('/phone', methods=['GET', 'POST'])
+def phone():
+    error_msg = ''
+    input_class = ''
+    phone = request.form.get('phone')
+    if request.method == 'POST':
+        error_msg = ''
+        input_class = ''
+
+        digits = sum(c.isdigit() for c in phone)
+
+        if (phone.startswith('+7') or phone.startswith('8')) and digits == 11 or not (phone.startswith('+7') or phone.startswith('8')) and digits == 10:
+            input_class = 'is-valid'
+            if phone.startswith('+7'):
+                phone = phone.replace('+7', '8')
+            elif not phone.startswith('8'):
+                phone = '8.' + phone
+
+            phone = phone.replace(' ', '').replace(
+                '.', '').replace('(', '').replace(')', '').replace('-', '')
+            phone = phone[0:1] + '-' + phone[1:4] + '-' + \
+                phone[4:7] + '-' + phone[7:9] + '-' + phone[9:]
+
+        elif any([c for c in phone if not c.isdigit() and c not in [' ', '(', ')', '-', '.', '+']]):
+            error_msg = 'Недопустимый ввод. В номере телефона встречаются недопустимые символы.'
+            input_class = 'is-invalid'
+            phone = ''
+        else:
+            error_msg = 'Недопустимый ввод. Неверное количество цифр.'
+            input_class = 'is-invalid'
+            phone = ''
+
+        print(phone)
+    return render_template('phone.html', input_class=input_class, error_msg=error_msg, phone=phone)

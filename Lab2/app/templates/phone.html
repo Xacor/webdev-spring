@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1> Номер телефона</h1>
+
+<form method="POST">
+    <div class="input-group mb-3">
+        <input class="form-control {{ input_class }}" type="tel" name="phone" id="phone"
+            value="{{ request.form.phone }}">
+        <span class="input-group-text">{{ phone }}</span>
+        <div id="validationServerPhone" class="invalid-feedback">
+            {{ error_msg }}
+        </div>
+    </div>
+    <div class=" mb-3">
+        <button type="submit" class="btn btn-primary">Проверить</button>
+    </div>
+</form>
+{% endblock %}
