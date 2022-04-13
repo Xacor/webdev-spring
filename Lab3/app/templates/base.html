@@ -44,6 +44,9 @@
               {% endif %}
             </li>
             <li class="nav-item">
+              <a class="nav-link" aria-current="page" href="{{ url_for('visits') }}">Посещения</a>
+            </li>
+            <li class="nav-item">
             {% if current_user.is_authenticated %}
               <a class="nav-link" aria-current="page" href="{{ url_for('secret_page') }}">Secret</a>
             {% endif %}
