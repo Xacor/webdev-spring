@@ -9,6 +9,7 @@ login_manager.login_message_category = 'warning'
 
 app = Flask(__name__)
 application = app #for mospolytech hosting
+app.config.from_pyfile('config.py')
 
 class User(UserMixin):
     def __init__(self, user_id, login, password):
@@ -19,13 +20,14 @@ class User(UserMixin):
 
 
 login_manager.init_app(app)
+
 @login_manager.user_loader
 def load_user(user_id):
     for user in get_users():
         if user['user_id'] == user_id:
             return User(**user)
     return None    
-app.config.from_pyfile('config.py')
+
 
 def get_users():
     return [{'user_id': '1', 'login': 'user', 'password': 'qwerty'}]
