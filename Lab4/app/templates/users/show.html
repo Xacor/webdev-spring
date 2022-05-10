@@ -1,28 +1,28 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>Информация о пользователе</h1>
+<h1>Show user's data</h1>
 <table class="table">
     <tbody>
         <tr>
-            <td>Логин</td>
+            <td>Login</td>
             <td>{{ user.login }}</td>
         </tr>
         <tr>
-            <td>Фамилия</td>
+            <td>Lastname</td>
             <td>{{ user.last_name }}</td>
         </tr>
         <tr>
-            <td>Имя</td>
+            <td>Firstname</td>
             <td>{{ user.first_name }}</td>
         </tr>
         <tr>
-            <td>Отчество</td>
+            <td>Middlename</td>
             <td>{{ user.middle_name or '' }}</td>
         </tr>
         <tr>
-            <td>Дата регистрации</td>
-            <td>{{ user.created_add }}</td>
+            <td>Registration date</td>
+            <td>{{ user.created_at }}</td>
         </tr>
     </tbody>
 </table>
