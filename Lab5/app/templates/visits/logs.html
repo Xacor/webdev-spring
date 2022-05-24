@@ -16,18 +16,18 @@
     </thead>
     <tbody>
         {% for record in records %}
-            <tr>
-                <td>{{ loop.index }}</td>
-                <td>
-                    {% if record.user_id %}
-                        {{ record.last_name }} {{ record.first_name}} {{ record.middle_name or ''}}
-                    {% else %}
-                        Неаутентифициронванный пользователь
-                    {% endif%}
-                </td>
-                <td>{{ record.path }}</td>
-                <td>{{ record.created_at.strftime('%d.%m.%y %H:%M:%S') }}</td>
-            </tr>
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>
+                {% if record.user_id %}
+                {{ record.last_name }} {{ record.first_name}} {{ record.middle_name or ''}}
+                {% else %}
+                Неаутентифицированный пользователь
+                {% endif%}
+            </td>
+            <td>{{ record.path }}</td>
+            <td>{{ record.created_at.strftime('%d.%m.%y %H:%M:%S') }}</td>
+        </tr>
         {% endfor %}
     </tbody>
 </table>

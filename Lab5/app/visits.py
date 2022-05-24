@@ -1,4 +1,5 @@
 from flask import Flask, render_template, session, request, redirect, url_for, flash, Blueprint, send_file
+from flask_login import current_user
 from app import mysql
 import math
 import io
@@ -29,18 +30,35 @@ def generate_report(records):
 def logs():
     page = request.args.get('page', 1, type=int)
 
-    query = ('SELECT visit_logs.*, users.last_name, users.first_name, users.middle_name' 
+    if current_user.can("watch_stat"):
+        query = ('SELECT visit_logs.*, users.last_name, users.first_name, users.middle_name' 
             ' FROM visit_logs LEFT JOIN users ON visit_logs.user_id = users.id' 
             ' ORDER BY visit_logs.created_at DESC' 
             ' LIMIT %s'
             ' OFFSET %s;')
+        query_params = (PER_PAGE, PER_PAGE*(page-1))
+
+        count_query = ('SELECT COUNT(*) AS count from visit_logs;')
+        count_query_params = ()
+        
+    else:
+        query = ('SELECT visit_logs.*, users.last_name, users.first_name, users.middle_name' 
+            ' FROM visit_logs LEFT JOIN users ON visit_logs.user_id = users.id WHERE users.id = %s' 
+            ' ORDER BY visit_logs.created_at DESC' 
+            ' LIMIT %s'
+            ' OFFSET %s;')
+        query_params = (current_user.id, PER_PAGE, PER_PAGE*(page-1))
+
+        count_query = ('SELECT COUNT(*) AS count from visit_logs WHERE user_id = %s;')
+        count_query_params = (current_user.id, )
+        
 
     with mysql.connection.cursor(named_tuple=True) as cursor:
-        cursor.execute(query, (PER_PAGE, PER_PAGE*(page-1)))
+        cursor.execute(query, query_params)
         records = cursor.fetchall()
 
     with mysql.connection.cursor(named_tuple=True) as cursor:
-        cursor.execute('SELECT COUNT(*) AS count from visit_logs')
+        cursor.execute(count_query, count_query_params)   
         total_count = cursor.fetchone().count
 
     total_pages = math.ceil(total_count/PER_PAGE)
