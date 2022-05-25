@@ -1,5 +1,5 @@
 from flask import Flask, render_template, session, request, redirect, url_for, flash, Blueprint, send_file
-from flask_login import current_user
+from flask_login import current_user, login_required
 from app import mysql
 import math
 import io
@@ -27,6 +27,7 @@ def generate_report(records):
 
 
 @bp.route('/logs')
+@login_required
 def logs():
     page = request.args.get('page', 1, type=int)
 
@@ -67,6 +68,7 @@ def logs():
 
 
 @bp.route('/stats/users')
+@login_required
 def users_stat():
     query = ('SELECT users.last_name, users.first_name, users.middle_name, COUNT(*) AS count'
             ' FROM users RIGHT JOIN visit_logs ON visit_logs.user_id = users.id' 
@@ -86,6 +88,7 @@ def users_stat():
 
 
 @bp.route('/stats/pages')
+@login_required
 def pages_stat():
     query = ('SELECT DISTINCT(path), COUNT(*) as count' 
             ' FROM visit_logs' 
