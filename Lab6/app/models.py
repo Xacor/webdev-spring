@@ -101,3 +101,16 @@ class Image(db.Model):
     @property
     def url(self):
         return url_for('image', image_id=self.id)
+
+class Review(db.Model):
+    __tablename__='reviews'
+
+    id = db.Column(db.Integer, primary_key=True)
+    rating = db.Column(db.Integer, nullable=False)
+    text = db.Column(db.String(100), nullable=False)
+    created_at = db.Column(db.DateTime,nullable=False, server_default=sa.sql.func.now())
+    course_id = db.Column(db.Integer, db.ForeignKey('courses.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+    user = db.relationship('User')
+    course = db.relationship('Course')
