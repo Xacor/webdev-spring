@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row my-3">
+        {% for rev in reviews[::] %}
+        <div class="d-flex my-3">
+            <div class="flex-shrink-0">
+                <img src="{{ url_for('static', filename='images/default-profile-picture-300x300.jpeg') }}"
+                    class="rounded-circle" alt="Sample Image" height="96px">
+            </div>
+            <div class="flex-grow-1 ms-3">
+                <h5>Jhon Carter <small class="text-muted"><i>{{ rev.created_at }}</i></small></h5>
+                <p>{{ rev.text }}</p>
+            </div>
+            <div>
+                <span>{{ rev.rating }}</span><span>★</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

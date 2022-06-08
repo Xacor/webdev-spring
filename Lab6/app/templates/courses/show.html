@@ -14,9 +14,9 @@
                 </p>
             </div>
             {% if current_user.is_authenticated %}
-                <a href="#" class="btn btn-outline-light btn-lg">Перейти к материалам курса</a>
+            <a href="#" class="btn btn-outline-light btn-lg">Перейти к материалам курса</a>
             {% else %}
-                <button class="btn btn-outline-light btn-lg" disabled>Записаться</button>
+            <button class="btn btn-outline-light btn-lg" disabled>Записаться</button>
             {% endif %}
         </div>
     </div>
@@ -32,36 +32,115 @@
         <h2 class="mb-3 text-center text-uppercase font-weight-bold">Программа курса</h2>
 
         {% for theme in course.themes %}
-            <div class="card mb-3">
-                <div class="card-header d-flex align-items-center">
-                    <h5 class="mb-0">Тема {{ loop.index }}. {{ theme.name }}</h5>
+        <div class="card mb-3">
+            <div class="card-header d-flex align-items-center">
+                <h5 class="mb-0">Тема {{ loop.index }}. {{ theme.name }}</h5>
+                {% if current_user.is_authenticated and current_user.id == course.author_id %}
+                <button class="btn btn-primary btn-sm ms-auto" title="Добавить пункт"
+                    data-parent-id="{{ theme.id }}">+</button>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                {% set outer_loop = loop %}
+                {% for subtheme in theme.subthemes %}
+                <div class="d-flex align-items-center">
+                    <p class="card-text mb-3">{{ outer_loop.index }}.{{ loop.index }}. {{ subtheme.name }}</p>
                     {% if current_user.is_authenticated and current_user.id == course.author_id %}
-                        <button class="btn btn-primary btn-sm ms-auto" title="Добавить пункт" data-parent-id="{{ theme.id }}">+</button>
+                    <a href="#" class="btn btn-sm ms-auto" title="Добавить материал"
+                        data-parent-id="{{ theme.id }}">+</a>
                     {% endif %}
                 </div>
-                <div class="card-body">
-                    {% set outer_loop = loop %}
-                    {% for subtheme in theme.subthemes %}
-                        <div class="d-flex align-items-center">
-                            <p class="card-text mb-3">{{ outer_loop.index }}.{{ loop.index }}. {{ subtheme.name }}</p>
-                            {% if current_user.is_authenticated and current_user.id == course.author_id %}
-                            <a href="#" class="btn btn-sm ms-auto" title="Добавить материал"
-                                data-parent-id="{{ theme.id }}">+</a>
-                            {% endif %}
-                        </div>
-                    {% endfor %}
-                </div>
+                {% endfor %}
             </div>
+        </div>
         {% endfor %}
 
         {% if current_user.is_authenticated and current_user.id == course.author_id %}
-            <div class="text-center">
-                <button type="button" class="btn btn-dark">
-                    Добавить тему
-                </button>
-            </div>
+        <div class="text-center">
+            <button type="button" class="btn btn-dark">
+                Добавить тему
+            </button>
+        </div>
         {% endif %}
     </section>
+
+    {% if current_user.is_authenticated %}
+    <div class="row my-3 border rounded">
+        <form method="POST">
+            <div class="row border-bottom py-2 bg-light">
+                <label for="text" class="form-label d-block">Оставьте отзыв</label>
+            </div>
+            <div class="my-3">
+                <textarea class="form-control" id="text" name="text" rows="3"></textarea>
+            </div>
+            <div class="col-md-3">
+                <label for="rating" class="form-label d-block">Оставьте
+                    оценку</label>
+                <select class="form-select my-3" aria-label="Оценка курса" id="rating" name="rating" required>
+                    <option selected value="5">Отлично</option>
+                    <option value="4">Хорошо</option>
+                    <option value="3">Удовлетворительно</option>
+                    <option value="2">Неудовлетворительно</option>
+                    <option value="1">Плохо</option>
+                    <option value="0">Ужасно</option>
+                </select>
+            </div>
+            <div class="col-md">
+                <button type="submit" class="btn btn-dark mb-3" value="Отправить">Отправить</button>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+
+    <div class="row my-3">
+        {% for rev in reviews[:-5:-1] %}
+        <div class="d-flex my-3">
+            <div class="flex-shrink-0">
+                <img src="{{ url_for('static', filename='images/default-profile-picture-300x300.jpeg') }}"
+                    class="rounded-circle" alt="Sample Image" height="96px">
+            </div>
+            <div class="flex-grow-1 ms-3">
+                <h5>{{ rev.user.first_name }} {{ rev.user.last_name }} <small class="text-muted"><i>{{ rev.created_at
+                            }}</i></small></h5>
+                <p>{{ rev.text }}</p>
+            </div>
+            <div>
+
+                {% if rev.rating == 5 %}
+                <span>Отлично</span>
+                {% endif %}
+
+                {% if rev.rating == 4 %}
+                <span>Хорошо</span>
+                {% endif %}
+
+                {% if rev.rating == 3 %}
+                <span>Удовлетворительно</span>
+                {% endif %}
+
+                {% if rev.rating == 2 %}
+                <span>Неудовлетворительно</span>
+                {% endif %}
+
+                {% if rev.rating == 1 %}
+                <span>Плохо</span>
+                {% endif %}
+
+                {% if rev.rating == 0 %}
+                <span>Ужасно</span>
+                {% endif %}
+
+
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="row">
+        <a class="btn btn-dark my-3 col-2 mx-auto" href="{{ url_for('courses.reviews', course_id=course.id) }}" role="
+            button">Смотреть все отзывы</a>
+    </div>
 </div>
+
+
 
 {% endblock %}
