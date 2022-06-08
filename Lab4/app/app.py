@@ -166,7 +166,7 @@ def update(user_id):
     errors = {'first_name': validate_fio(params['first_name']), 'last_name': validate_fio(params['last_name'])}
     print(errors)
 
-    if errors['first_name'] != 'Ok' or errors['last_name'] is not None:
+    if errors['first_name'] is not None or errors['last_name'] is not None:
         return render_template('users/edit.html', user=params, roles=load_roles(), errors=errors)
     
     else:
@@ -264,7 +264,7 @@ def validate_password(password: str):
     #(?=.{8,128}$)(?=.*[A-ZА-Я])(?=.*[0-9])[a-zA-Zа-яА-Я0-9~!?@#$%^&*_\-+()[\]{}></\\|\"\'.,:;]+
     lenp = re.compile(r'.{8,128}')
     uppercharp = re.compile(r'.*[A-ZА-Я]')
-    lowercahrp = re.compile(r'[a-zа-я]')
+    lowercahrp = re.compile(r'.*[a-zа-я]')
     digitp = re.compile(r'.*[0-9]')
     symbolsp = re.compile(r'[a-zA-Zа-яА-Я0-9~!?@#$%^&*\_\-+()[\]{}></\\|\"\'.,:;]+')
     msg = None
