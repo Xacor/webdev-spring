@@ -64,9 +64,10 @@
         {% endif %}
     </section>
 
-    {% if current_user.is_authenticated %}
+    {% if current_user.is_authenticated and not curr_review %}
+
     <div class="row my-3 border rounded">
-        <form method="POST">
+        <form method="post" action="{{ url_for('courses.create_review', course_id = course.id) }}">
             <div class="row border-bottom py-2 bg-light">
                 <label for="text" class="form-label d-block">Оставьте отзыв</label>
             </div>
@@ -90,10 +91,38 @@
             </div>
         </form>
     </div>
+    {% elif curr_review %}
+    <div class="d-flex my-5 py-2 border-bottom">
+        <div class="flex-shrink-0">
+            <img src="{{ url_for('static', filename='images/default-profile-picture-300x300.jpeg') }}"
+                class="rounded-circle" alt="Sample Image" height="96px">
+        </div>
+        <div class="flex-grow-1 ms-3">
+            <h5>{{ curr_review.user.first_name }} {{ curr_review.user.last_name }} <small class="text-muted"><i>{{
+                        curr_review.created_at
+                        }}</i></small></h5>
+            <p>{{ curr_review.text }}</p>
+        </div>
+        <div>
+            {% if curr_review.rating == 5 %}
+            <span>Отлично</span>
+            {% elif curr_review.rating == 4 %}
+            <span>Хорошо</span>
+            {% elif curr_review.rating == 3 %}
+            <span>Удовлетворительно</span>
+            {% elif curr_review.rating == 2 %}
+            <span>Неудовлетворительно</span>
+            {% elif curr_review.rating == 1 %}
+            <span>Плохо</span>
+            {% elif curr_review.rating == 0 %}
+            <span>Ужасно</span>
+            {% endif %}
+        </div>
+    </div>
     {% endif %}
 
     <div class="row my-3">
-        {% for rev in reviews[:-5:-1] %}
+        {% for rev in reviews %}
         <div class="d-flex my-3">
             <div class="flex-shrink-0">
                 <img src="{{ url_for('static', filename='images/default-profile-picture-300x300.jpeg') }}"
@@ -105,32 +134,19 @@
                 <p>{{ rev.text }}</p>
             </div>
             <div>
-
                 {% if rev.rating == 5 %}
                 <span>Отлично</span>
-                {% endif %}
-
-                {% if rev.rating == 4 %}
+                {% elif rev.rating == 4 %}
                 <span>Хорошо</span>
-                {% endif %}
-
-                {% if rev.rating == 3 %}
+                {% elif rev.rating == 3 %}
                 <span>Удовлетворительно</span>
-                {% endif %}
-
-                {% if rev.rating == 2 %}
+                {% elif rev.rating == 2 %}
                 <span>Неудовлетворительно</span>
-                {% endif %}
-
-                {% if rev.rating == 1 %}
+                {% elif rev.rating == 1 %}
                 <span>Плохо</span>
-                {% endif %}
-
-                {% if rev.rating == 0 %}
+                {% elif rev.rating == 0 %}
                 <span>Ужасно</span>
                 {% endif %}
-
-
             </div>
         </div>
         {% endfor %}

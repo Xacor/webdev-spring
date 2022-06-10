@@ -6,7 +6,7 @@ from flask_login import current_user
 
 bp = Blueprint('courses', __name__, url_prefix='/courses')
 
-PER_PAGE = 3
+PER_PAGE = 4
 
 COURSE_PARAMS = ['author_id', 'name', 'category_id', 'short_desc', 'full_desc']
 REVIEW_PARAMS = ['rating', 'text']
@@ -60,20 +60,49 @@ def create():
     flash(f'Курс {course.name} был успешно создан.')
     return redirect(url_for('courses.index'))
 
-@bp.route('/<int:course_id>', methods=['GET', 'POST'])
+@bp.route('/<int:course_id>')
 def show(course_id):
     course = Course.query.get(course_id)
-    reviews = Review.query.order_by(Review.created_at).filter_by(course_id=course_id)
-    if request.method == 'POST':
-        new_review = Review(**params(REVIEW_PARAMS), course_id=course_id, user_id=current_user.id)
-        db.session.add(new_review)
-        db.session.commit()
-        flash(f'Комментарий был успешно создан.')
-        redirect(url_for('courses.show', course_id=course.id))
+    reviews = Review.query.filter(Review.course_id == course_id).order_by(Review.created_at.desc()).limit(5)
+    
+    curr_review = None
+    if current_user.is_authenticated:
+        curr_review = Review.query.filter(Review.course_id == course_id).filter(Review.user_id == current_user.id).first()
 
-    return render_template('courses/show.html', course=course, reviews=reviews)
+    return render_template('courses/show.html', course=course, reviews=reviews, curr_review=curr_review)
 
 @bp.route('/<int:course_id>/reviews')
 def reviews(course_id):
-    reviews = Review.query.order_by(Review.created_at).filter_by(course_id=course_id)
-    return render_template('courses/reviews.html', reviews=reviews)
+    page = request.args.get('page', 1, type=int)
+    reviews = Review.query.filter(Review.course_id == course_id).order_by(Review.created_at.desc())
+    sort_type = request.args.get('filters')
+
+    if sort_type == 'new_first': reviews = Review.query.filter(Review.course_id == course_id).order_by(Review.created_at.desc())
+    elif sort_type == 'old_first': reviews = Review.query.filter(Review.course_id == course_id).order_by(Review.created_at.asc())
+    elif sort_type == 'pos_first': reviews = Review.query.filter(Review.course_id == course_id).order_by(Review.rating.desc())
+    elif sort_type == 'neg_first': reviews = Review.query.filter(Review.course_id == course_id).order_by(Review.rating.asc())
+
+
+    pagination = reviews.paginate(page, PER_PAGE)
+    reviews = reviews.paginate(page, PER_PAGE).items
+    curr_review = None
+    if current_user.is_authenticated:
+        curr_review = Review.query.filter(Review.course_id == course_id).filter(Review.user_id == current_user.id).first()
+
+
+    return render_template('courses/reviews.html', reviews=reviews, course_id=course_id, pagination=pagination, curr_review=curr_review)
+
+@bp.route('/<int:course_id>/reviews/create', methods=['POST'])
+def create_review(course_id):
+    new_review = Review(**params(REVIEW_PARAMS), course_id=course_id, user_id=current_user.id)
+    db.session.add(new_review)
+
+    course = Course.query.get(course_id)
+    course.rating_num += 1
+    course.rating_sum += int(new_review.rating)
+
+    db.session.commit()
+
+
+    flash(f'Комментарий был успешно создан.')
+    return redirect(url_for('courses.show', course_id=course_id))

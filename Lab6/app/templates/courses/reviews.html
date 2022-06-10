@@ -1,23 +1,143 @@
 {% extends 'base.html' %}
 
+{% from 'pagination.html' import render_pagination %}
+
 {% block content %}
 <div class="container mt-5">
-    <div class="row my-3">
-        {% for rev in reviews[::] %}
-        <div class="d-flex my-3">
-            <div class="flex-shrink-0">
-                <img src="{{ url_for('static', filename='images/default-profile-picture-300x300.jpeg') }}"
-                    class="rounded-circle" alt="Sample Image" height="96px">
+    {% if current_user.is_authenticated and not curr_review %}
+
+    <div class="row my-3 border rounded">
+        <form method="post" action="{{ url_for('courses.create_review', course_id = course_id) }}">
+            <div class="row border-bottom py-2 bg-light">
+                <label for="text" class="form-label d-block">Оставьте отзыв</label>
             </div>
-            <div class="flex-grow-1 ms-3">
-                <h5>Jhon Carter <small class="text-muted"><i>{{ rev.created_at }}</i></small></h5>
-                <p>{{ rev.text }}</p>
+            <div class="my-3">
+                <textarea class="form-control" id="text" name="text" rows="3"></textarea>
             </div>
-            <div>
-                <span>{{ rev.rating }}</span><span>★</span>
+            <div class="col-md-3">
+                <label for="rating" class="form-label d-block">Оставьте
+                    оценку</label>
+                <select class="form-select my-3" aria-label="Оценка курса" id="rating" name="rating" required>
+                    <option selected value="5">Отлично</option>
+                    <option value="4">Хорошо</option>
+                    <option value="3">Удовлетворительно</option>
+                    <option value="2">Неудовлетворительно</option>
+                    <option value="1">Плохо</option>
+                    <option value="0">Ужасно</option>
+                </select>
             </div>
-        </div>
-        {% endfor %}
+            <div class="col-md">
+                <button type="submit" class="btn btn-dark mb-3" value="Отправить">Отправить</button>
+            </div>
+        </form>
     </div>
-</div>
-{% endblock %}
+    {% elif curr_review %}
+    <div class="d-flex my-5 py-2 border-bottom">
+        <div class="flex-shrink-0">
+            <img src="{{ url_for('static', filename='images/default-profile-picture-300x300.jpeg') }}"
+                class="rounded-circle" alt="Sample Image" height="96px">
+        </div>
+        <div class="flex-grow-1 ms-3">
+            <h5>{{ curr_review.user.first_name }} {{ curr_review.user.last_name }} <small class="text-muted"><i>{{
+                        curr_review.created_at
+                        }}</i></small></h5>
+            <p>{{ curr_review.text }}</p>
+        </div>
+        <div>
+
+            {% if curr_review.rating == 5 %}
+            <span>Отлично</span>
+            {% endif %}
+
+            {% if curr_review.rating == 4 %}
+            <span>Хорошо</span>
+            {% endif %}
+
+            {% if curr_review.rating == 3 %}
+            <span>Удовлетворительно</span>
+            {% endif %}
+
+            {% if curr_review.rating == 2 %}
+            <span>Неудовлетворительно</span>
+            {% endif %}
+
+            {% if curr_review.rating == 1 %}
+            <span>Плохо</span>
+            {% endif %}
+
+            {% if curr_review.rating == 0 %}
+            <span>Ужасно</span>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <form class="my-5 row align-items-center">
+        <div class="col-md-4 my-3">
+            <select class="form-select" id="filters" name="filters" title="Сортировка">
+                <option value="new_first" {% if 'new_first' in request.args.getlist('filters') %}selected{% endif %}>
+                    Сначала новые
+                </option>
+                <option value="old_first" {% if 'old_first' in request.args.getlist('filters') %}selected{% endif %}>
+                    Сначала старые
+                </option>
+                <option value="pos_first" {% if 'pos_first' in request.args.getlist('filters') %}selected{% endif %}>
+                    Сначала
+                    положительные</option>
+                <option value="neg_first" {% if 'neg_first' in request.args.getlist('filters') %}selected{% endif %}>
+                    Сначала
+                    отрицательные</option>
+            </select>
+        </div>
+
+        <div class="col-md-2 my-3 align-self-end">
+            <button type="submit" class="btn btn-dark w-100 mt-auto">Применить</button>
+        </div>
+    </form>
+
+    <div class="row my-3">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Пользователь</th>
+                    <th>Дата отзыва</th>
+                    <th>Оценка</th>
+                    <th>Текст</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rev in reviews %}
+                <tr>
+                <tr>
+                    <td>{{ rev.user.first_name }} {{rev.user.last_name}}</td>
+                    <td>{{ rev.created_at.strftime('%d.%m.%y %H:%M:%S') }}</td>
+                    <td>
+                        {% if rev.rating == 5 %}
+                        <span>Отлично</span>
+                        {% elif rev.rating == 4 %}
+                        <span>Хорошо</span>
+                        {% elif rev.rating == 3 %}
+                        <span>Удовлетворительно</span>
+                        {% elif rev.rating == 2 %}
+                        <span>Неудовлетворительно</span>
+                        {% elif rev.rating == 1 %}
+                        <span>Плохо</span>
+                        {% elif rev.rating == 0 %}
+                        <span>Ужасно</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ rev.text }}</td>
+                </tr>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if reviews %}
+        <div class="mb-5">
+            {{ render_pagination(pagination, request.endpoint, {'course_id': reviews[0].course_id, 'filters':
+            request.args.getlist('filters')}) }}
+        </div>
+        {% endif %}
+    </div>
+    {% endblock %}
