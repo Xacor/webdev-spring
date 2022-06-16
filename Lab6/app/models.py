@@ -109,8 +109,8 @@ class Review(db.Model):
     rating = db.Column(db.Integer, nullable=False)
     text = db.Column(db.String(100), nullable=False)
     created_at = db.Column(db.DateTime,nullable=False, server_default=sa.sql.func.now())
-    course_id = db.Column(db.Integer, db.ForeignKey('courses.id'))
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    course_id = db.Column(db.Integer, db.ForeignKey('courses.id'),  nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'),  nullable=False)
 
     user = db.relationship('User')
     course = db.relationship('Course')
