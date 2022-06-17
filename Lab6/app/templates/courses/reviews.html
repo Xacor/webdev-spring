@@ -47,25 +47,15 @@
 
             {% if curr_review.rating == 5 %}
             <span>Отлично</span>
-            {% endif %}
-
-            {% if curr_review.rating == 4 %}
+            {% elif curr_review.rating == 4 %}
             <span>Хорошо</span>
-            {% endif %}
-
-            {% if curr_review.rating == 3 %}
+            {% elif curr_review.rating == 3 %}
             <span>Удовлетворительно</span>
-            {% endif %}
-
-            {% if curr_review.rating == 2 %}
+            {% elif curr_review.rating == 2 %}
             <span>Неудовлетворительно</span>
-            {% endif %}
-
-            {% if curr_review.rating == 1 %}
+            {% elif curr_review.rating == 1 %}
             <span>Плохо</span>
-            {% endif %}
-
-            {% if curr_review.rating == 0 %}
+            {% elif curr_review.rating == 0 %}
             <span>Ужасно</span>
             {% endif %}
         </div>
@@ -110,7 +100,7 @@
                 <tr>
                 <tr>
                     <td>{{ rev.user.first_name }} {{rev.user.last_name}}</td>
-                    <td>{{ rev.created_at.strftime('%d.%m.%y %H:%M:%S') }}</td>
+                    <td>{{ rev.created_at }}</td>
                     <td>
                         {% if rev.rating == 5 %}
                         <span>Отлично</span>
