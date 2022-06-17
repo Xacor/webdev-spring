@@ -88,7 +88,7 @@ def reviews(course_id):
 
 
     pagination = reviews.paginate(page, PER_PAGE)
-    reviews = reviews.paginate(page, PER_PAGE).items
+    reviews = pagination.items
 
     curr_review = None
     if current_user.is_authenticated:
@@ -108,5 +108,5 @@ def create_review(course_id):
 
     db.session.commit()
     flash(f'Комментарий был успешно создан.')
-    
+
     return redirect(url_for('courses.show', course_id=course_id))
