@@ -77,14 +77,19 @@ def reviews(course_id):
     reviews = Review.query.filter(Review.course_id == course_id).order_by(Review.created_at.desc())
     sort_type = request.args.get('filters')
 
-    if sort_type == 'new_first': reviews = Review.query.filter(Review.course_id == course_id).order_by(Review.created_at.desc())
-    elif sort_type == 'old_first': reviews = Review.query.filter(Review.course_id == course_id).order_by(Review.created_at.asc())
-    elif sort_type == 'pos_first': reviews = Review.query.filter(Review.course_id == course_id).order_by(Review.rating.desc())
-    elif sort_type == 'neg_first': reviews = Review.query.filter(Review.course_id == course_id).order_by(Review.rating.asc())
+    if sort_type == 'new_first': 
+        reviews = Review.query.filter(Review.course_id == course_id).order_by(Review.created_at.desc())
+    elif sort_type == 'old_first': 
+        reviews = Review.query.filter(Review.course_id == course_id).order_by(Review.created_at.asc())
+    elif sort_type == 'pos_first': 
+        reviews = Review.query.filter(Review.course_id == course_id).order_by(Review.rating.desc())
+    elif sort_type == 'neg_first': 
+        reviews = Review.query.filter(Review.course_id == course_id).order_by(Review.rating.asc())
 
 
     pagination = reviews.paginate(page, PER_PAGE)
     reviews = reviews.paginate(page, PER_PAGE).items
+
     curr_review = None
     if current_user.is_authenticated:
         curr_review = Review.query.filter(Review.course_id == course_id).filter(Review.user_id == current_user.id).first()
@@ -102,7 +107,6 @@ def create_review(course_id):
     course.rating_sum += int(new_review.rating)
 
     db.session.commit()
-
-
     flash(f'Комментарий был успешно создан.')
+    
     return redirect(url_for('courses.show', course_id=course_id))
